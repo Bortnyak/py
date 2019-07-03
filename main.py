@@ -61,4 +61,37 @@ def get_book_by_isbn(isbn):
       }
   return jsonify(return_value)
 
+# PUT
+@app.route('/books/<int:isbn>', methods=['PUT'])
+def replace_book(isbn):
+  request_data = request.get_json()
+
+  new_book = {
+    'name': request_data['name'],
+    'price': request_data['price'],
+    'isbn': isbn
+  }
+  i = 0
+  for book in books:
+    currentIsbn = book["isbn"]
+    if currentIsbn == isbn:
+      books[i] = new_book
+    i += 1
+  response = Response("OK", 204, mimetype="application/json")
+  return response
+
+# PATCH
+@app.route('/books/<int:isbn>', methods=['PATCH'])
+def update_book(isbn):
+  request_data = request.get_json()
+  update_book = {}
+  if ("name" in request_data):
+    update_book["name"] = request_data["name"]
+  for book in books:
+    if book["isbn"] == isbn:
+      book.update(update_book)
+  response = Response("", status=204)
+  response.headers['Location'] = "/books/" + str(isbn)
+  return response
+
 app.run(port=5000)
